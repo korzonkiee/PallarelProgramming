@@ -164,7 +164,7 @@ namespace monitors
             // If knight is King (zero index)
             // then his plate is at index (NumberOfKnights - 1).
             if (i == 0)
-                return 5;
+                return Config.NumberOfKnights - 1;
 
             // If knight has odd index
             // then plate is on his right (next index).
