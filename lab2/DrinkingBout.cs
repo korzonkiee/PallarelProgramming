@@ -74,6 +74,11 @@ namespace monitors
                 if (WantsEat(i) && CanEat(i))
                 {
                     WakeUpKnightIfNecessary(i);
+
+                    // In order to avoid unneccessary wakeups
+                    // skip one neighbour - he will not be able
+                    // to eat anyway.
+                    i++;
                 }
             }
         }
