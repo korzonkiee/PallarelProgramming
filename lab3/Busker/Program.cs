@@ -7,17 +7,22 @@ namespace Busker
     {
         static void Main(string[] args)
         {
-            var conn = new HubConnectionBuilder()
-                .WithUrl("http://localhost:3000/hubs/orchestrator")
-                .WithConsoleLogger()
-                .Build();
+            var buskersLoader = new BuskersLoader();
+            var musicians = buskersLoader
+                .LoadBuskersFromFile(Files.BuskersFile);
+            
+            // var conn = new HubConnectionBuilder()
+            //     .WithUrl("http://localhost:5000/hubs/orchestrator")
+            //     .WithConsoleLogger()
+            //     .Build();
 
-            conn.StartAsync().Wait();
-            conn.InvokeAsync("test").Wait();
+            // conn.StartAsync().Wait();
+            // conn.InvokeAsync("test").Wait();
 
-            conn.StopAsync().Wait();
+            // conn.StopAsync().Wait();
+            // conn.DisposeAsync().Wait();
 
-            Console.WriteLine("Message sent.");
+            // Console.WriteLine("Message sent.");
         }
     }
 }

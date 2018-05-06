@@ -15,7 +15,7 @@ namespace Orchestrator
         public static void Main(string[] args)
         {
             CreateWebHostBuilder(args)
-                .UseUrls("http://localhost:3000")
+                .UseUrls("http://localhost:5000")
                 .Build()
                 .Run();
         }
