@@ -13,18 +13,14 @@ namespace Orchestrator
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSignalR();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
+            app.UseSignalR(routes =>
             {
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.Run(async (context) =>
-            {
-                await context.Response.WriteAsync("Hello World!");
+                routes.MapHub<OrchestratorHub>("/hubs/orchestrator");
             });
         }
     }
