@@ -11,19 +11,23 @@ namespace Busker
     public class Busker
     {
         private HubConnection connection;
-        private Dictionary<string, Neighbour> neighbours;
+        private Dictionary<int, Neighbour> neighbours;
 
-        public string Id { get; }
+        public int Value { get; }
         public Position Position { get; }
         public BuskerState State { get; } = BuskerState.Unknown;
 
-        public Busker(string id, Position position)
+        public int Id { get; }
+
+        public Busker(int value, Position position)
         {
-            Id = id;
+            Value = value;
             Position = position;
+
+            Id = IdGenerator.GetId();
         }
 
-        public void InitializeNeighbours(Dictionary<string, Neighbour> neighbours)
+        public void InitializeNeighbours(Dictionary<int, Neighbour> neighbours)
         {
             this.neighbours = neighbours;
         }
@@ -41,6 +45,8 @@ namespace Busker
             connection.On("start", () => OnStart());
             connection.On("exchange", (AcknowledgeMessage message) => OnExchange(message));
 
+            Console.WriteLine($"Busker {Id} enters city square.");
+
             await connection.InvokeAsync("connect", new ConnectMessage()
             {
                 SenderId = Id
@@ -57,7 +63,7 @@ namespace Busker
         {
             var message = new AcknowledgeMessage()
             {
-                V = Id,
+                Value = this.Value,
                 ReceiverIds = neighbours.Keys
             };
 
@@ -66,6 +72,7 @@ namespace Busker
 
         private Task OnExchange(AcknowledgeMessage message)
         {
+            Console.WriteLine($"Busker {Id} received value: {message.Value}.");
             return Task.CompletedTask;
         }
     }

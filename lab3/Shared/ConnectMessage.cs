@@ -1,7 +1,9 @@
+using System;
+
 namespace Shared
 {
     public sealed class ConnectMessage : Message
     {
-        public string SenderId { get; set; }
+        public int SenderId { get; set; }
     }
 }

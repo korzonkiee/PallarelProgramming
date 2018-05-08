@@ -26,7 +26,7 @@ namespace Orchestrator
             {
                 await semaphore.WaitAsync();
 
-                await hub.Groups.AddToGroupAsync(connectionId, message.SenderId);
+                await hub.Groups.AddToGroupAsync(connectionId, message.SenderId.ToString());
 
                 connectedBuskers++;
 
@@ -49,7 +49,9 @@ namespace Orchestrator
         {
             foreach (var receiver in message.ReceiverIds)
             {
-                await hub.Clients.Group(receiver).SendAsync("exchange", message);
+                await hub.Clients
+                    .Group(receiver.ToString())
+                    .SendAsync("exchange", message);
             }
         }
     }
