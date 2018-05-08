@@ -18,7 +18,7 @@ namespace Orchestrator
             return orchestrator.Connect(Context.ConnectionId, message);
         }
 
-        public Task Exchange(ExchangeMessage message)
+        public Task Exchange(AcknowledgeMessage message)
         {
             return orchestrator.SendMessage("exchange", message);
         }

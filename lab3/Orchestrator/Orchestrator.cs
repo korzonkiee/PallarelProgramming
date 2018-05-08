@@ -13,7 +13,7 @@ namespace Orchestrator
 
         private readonly int numberOfBuskers;
         private int connectedBuskers = 0;
-        
+
 
         public Orchestrator(IHubContext<OrchestratorHub> hub)
         {
@@ -26,7 +26,7 @@ namespace Orchestrator
             {
                 await semaphore.WaitAsync();
 
-                await hub.Groups.AddAsync(connectionId, message.SenderId);
+                await hub.Groups.AddToGroupAsync(connectionId, message.SenderId);
 
                 connectedBuskers++;
 

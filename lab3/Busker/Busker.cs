@@ -12,11 +12,11 @@ namespace Busker
     {
         private HubConnection connection;
         private Dictionary<string, Neighbour> neighbours;
-        
+
         public string Id { get; }
         public Position Position { get; }
         public BuskerState State { get; } = BuskerState.Unknown;
-        
+
         public Busker(string id, Position position)
         {
             Id = id;
@@ -39,7 +39,7 @@ namespace Busker
             await connection.StartAsync();
 
             connection.On("start", () => OnStart());
-            connection.On("exchange", (ExchangeMessage message) => OnExchange(message));
+            connection.On("exchange", (AcknowledgeMessage message) => OnExchange(message));
 
             await connection.InvokeAsync("connect", new ConnectMessage()
             {
@@ -47,9 +47,15 @@ namespace Busker
             });
         }
 
+        private Task OnClosed(Exception arg)
+        {
+            Console.WriteLine(arg.Message);
+            return connection.DisposeAsync();
+        }
+
         private Task OnStart()
         {
-            var message = new ExchangeMessage()
+            var message = new AcknowledgeMessage()
             {
                 V = Id,
                 ReceiverIds = neighbours.Keys
@@ -58,15 +64,9 @@ namespace Busker
             return connection.InvokeAsync("exchange", message);
         }
 
-        private Task OnExchange(ExchangeMessage message)
+        private Task OnExchange(AcknowledgeMessage message)
         {
-        }
-
-        private void OnClosed(Exception obj)
-        {
-            Console.WriteLine(obj.Message);
-
-            connection.DisposeAsync().Wait();
+            return Task.CompletedTask;
         }
     }
 }
