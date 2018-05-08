@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Linq;
+using System.Threading;
 using Microsoft.AspNetCore.SignalR.Client;
+using Shared;
 
 namespace Busker
 {
@@ -8,21 +11,22 @@ namespace Busker
         static void Main(string[] args)
         {
             var buskersLoader = new BuskersLoader();
-            var musicians = buskersLoader
+            var buskers = buskersLoader
                 .LoadBuskersFromFile(Files.BuskersFile);
-            
-            // var conn = new HubConnectionBuilder()
-            //     .WithUrl("http://localhost:5000/hubs/orchestrator")
-            //     .WithConsoleLogger()
-            //     .Build();
 
-            // conn.StartAsync().Wait();
-            // conn.InvokeAsync("test").Wait();
+            var buskersThreads = new Thread[buskers.Length];
+            for (int i = 0; i < buskers.Length; i++)
+            {
+                int _i = i;
+                buskersThreads[_i] = new Thread(async () =>
+                {
+                    await buskers[_i].EnterCitySquare();
+                });
 
-            // conn.StopAsync().Wait();
-            // conn.DisposeAsync().Wait();
+                buskersThreads[_i].Start();
+            }
 
-            // Console.WriteLine("Message sent.");
+            Console.Read();
         }
     }
 }

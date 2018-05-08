@@ -19,7 +19,7 @@ namespace BuskerUnitTests
         [Fact]
         public void Test_BuskerLoader()
         {
-            var path = $"../../../{Config.BuskersFile}";
+            var path = $"../../../positions.txt";
 
             var buskers = buskerLoader.LoadBuskersFromFile(path);
 

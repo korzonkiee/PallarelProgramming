@@ -14,6 +14,8 @@ namespace Orchestrator
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSignalR();
+            services.AddTransient<OrchestratorHub>();
+            services.AddSingleton<Orchestrator>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
