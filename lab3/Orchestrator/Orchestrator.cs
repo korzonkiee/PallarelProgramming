@@ -47,11 +47,11 @@ namespace Orchestrator
 
         public async Task SendMessage(string methodName, Message message)
         {
-            foreach (var receiver in message.ReceiverIds)
+            foreach (var receiver in message.ReceiversIds)
             {
                 await hub.Clients
                     .Group(receiver.ToString())
-                    .SendAsync(nameof(AcknowledgeMessage), message);
+                    .SendAsync(methodName, message);
             }
         }
     }

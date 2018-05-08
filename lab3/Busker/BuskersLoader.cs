@@ -52,7 +52,7 @@ namespace Busker
             {
                 var neighbours = buskers
                     .Where(b => b != buskers[i] && b.Position.DistanceTo(buskers[i].Position) <= Config.HearingRange)
-                    .Select(b => new Neighbour(b.Id, b.Value))
+                    .Select(b => new Neighbour(b.Id))
                     .ToDictionary(b => b.Id);
 
                 buskers[i].InitializeNeighbours(neighbours);

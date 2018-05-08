@@ -5,6 +5,6 @@ namespace Shared
 {
     public abstract class Message
     {
-        public IEnumerable<int> ReceiverIds { get; set; }
+        public IEnumerable<int> ReceiversIds { get; set; }
     }
 }

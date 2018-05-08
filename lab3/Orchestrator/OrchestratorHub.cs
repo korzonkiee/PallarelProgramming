@@ -20,9 +20,15 @@ namespace Orchestrator
         }
 
         [HubMethodName(nameof(AcknowledgeMessage))]
-        public Task Exchange(AcknowledgeMessage message)
+        public Task Acknowledge(AcknowledgeMessage message)
         {
             return orchestrator.SendMessage(nameof(AcknowledgeMessage), message);
+        }
+
+        [HubMethodName(nameof(StateMessage))]
+        public Task Status(StateMessage message)
+        {
+            return orchestrator.SendMessage(nameof(StateMessage), message);
         }
     }
 }

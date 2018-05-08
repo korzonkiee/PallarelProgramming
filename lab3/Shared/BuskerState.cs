@@ -1,4 +1,4 @@
-namespace Busker
+namespace Shared
 {
     public enum BuskerState
     {
