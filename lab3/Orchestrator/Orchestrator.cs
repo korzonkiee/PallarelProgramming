@@ -36,7 +36,7 @@ namespace Orchestrator
                 }
                 else
                 {
-                    await hub.Clients.All.SendAsync("start");
+                    await hub.Clients.All.SendAsync(nameof(StartMessage));
                 }
             }
             finally
@@ -51,7 +51,7 @@ namespace Orchestrator
             {
                 await hub.Clients
                     .Group(receiver.ToString())
-                    .SendAsync("exchange", message);
+                    .SendAsync(nameof(AcknowledgeMessage), message);
             }
         }
     }

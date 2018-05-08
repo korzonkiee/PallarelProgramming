@@ -13,14 +13,16 @@ namespace Orchestrator
             this.orchestrator = orchestrator;
         }
 
+        [HubMethodName(nameof(ConnectMessage))]
         public Task Connect(ConnectMessage message)
         {
             return orchestrator.Connect(Context.ConnectionId, message);
         }
 
+        [HubMethodName(nameof(AcknowledgeMessage))]
         public Task Exchange(AcknowledgeMessage message)
         {
-            return orchestrator.SendMessage("exchange", message);
+            return orchestrator.SendMessage(nameof(AcknowledgeMessage), message);
         }
     }
 }

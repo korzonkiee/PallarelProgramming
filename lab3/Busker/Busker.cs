@@ -42,12 +42,12 @@ namespace Busker
 
             await connection.StartAsync();
 
-            connection.On("start", () => OnStart());
-            connection.On("exchange", (AcknowledgeMessage message) => OnExchange(message));
+            connection.On(nameof(StartMessage), () => OnStart());
+            connection.On(nameof(AcknowledgeMessage), (AcknowledgeMessage message) => OnAcknowledge(message));
 
             Console.WriteLine($"Busker {Id} enters city square.");
 
-            await connection.InvokeAsync("connect", new ConnectMessage()
+            await connection.InvokeAsync(nameof(ConnectMessage), new ConnectMessage()
             {
                 SenderId = Id
             });
@@ -67,10 +67,10 @@ namespace Busker
                 ReceiverIds = neighbours.Keys
             };
 
-            return connection.InvokeAsync("exchange", message);
+            return connection.InvokeAsync(nameof(AcknowledgeMessage), message);
         }
 
-        private Task OnExchange(AcknowledgeMessage message)
+        private Task OnAcknowledge(AcknowledgeMessage message)
         {
             Console.WriteLine($"Busker {Id} received value: {message.Value}.");
             return Task.CompletedTask;
