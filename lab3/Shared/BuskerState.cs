@@ -4,6 +4,7 @@ namespace Shared
     {
         Unknown,
         Winner,
-        Looser
+        Looser,
+        Inactive
     }
 }

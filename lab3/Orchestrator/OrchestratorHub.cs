@@ -30,5 +30,23 @@ namespace Orchestrator
         {
             return orchestrator.SendMessage(nameof(StateMessage), message);
         }
+
+        [HubMethodName(nameof(FinishedPerformanceMessage))]
+        public Task FinishedPerformance(FinishedPerformanceMessage message)
+        {
+            return orchestrator.SendMessage(nameof(FinishedPerformanceMessage), message);
+        }
+
+        [HubMethodName(nameof(PerformancePermissionMessage))]
+        public Task PerformancePermission(PerformancePermissionMessage message)
+        {
+            return orchestrator.SendMessage(nameof(PerformancePermissionMessage), message);
+        }
+
+        [HubMethodName(nameof(RequestPerformanceMessage))]
+        public Task RequestPerformance(RequestPerformanceMessage message)
+        {
+            return orchestrator.SendMessage(nameof(RequestPerformanceMessage), message);
+        }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using Shared;
 
 namespace Busker
 {
@@ -6,6 +7,9 @@ namespace Busker
     {
         public int Id { get; }
         public int? Value { get; set; }
+
+        public BuskerState State { get; set; }
+        public PerformancePermission PermissionToPerform { get; set; }
 
         public Neighbour(int id)
         {
