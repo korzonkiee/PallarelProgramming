@@ -2,14 +2,14 @@ namespace Shared
 {
     public enum Trigger
     {
-        Connect,
-        Acknowledge,
+        Conn,
+        Ack,
         Win,
         Loose,
         Notify,
-        Request,
-        PermissionResponse,
-        FinishedPerformance,
-        Reset
+        Req,
+        Perm,
+        End,
+        Rst
     }
 }

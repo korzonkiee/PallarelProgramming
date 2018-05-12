@@ -20,7 +20,7 @@ namespace Orchestrator
             this.hub = hub;
             this.numberOfBuskers = BuskersLoader.GetNumberOfMusicians();
         }
-        public async Task Connect(string connectionId, ConnectMessage message)
+        public async Task Connect(string connectionId, Conn message)
         {
             try
             {
@@ -36,7 +36,7 @@ namespace Orchestrator
                 }
                 else
                 {
-                    await hub.Clients.All.SendAsync(nameof(ConnectedMessage));
+                    await hub.Clients.All.SendAsync(nameof(Conn));
                 }
             }
             finally

@@ -13,40 +13,40 @@ namespace Orchestrator
             this.orchestrator = orchestrator;
         }
 
-        [HubMethodName(nameof(ConnectMessage))]
-        public Task Connect(ConnectMessage message)
+        [HubMethodName(nameof(Conn))]
+        public Task Connect(Conn message)
         {
             return orchestrator.Connect(Context.ConnectionId, message);
         }
 
-        [HubMethodName(nameof(AcknowledgeMessage))]
-        public Task Acknowledge(AcknowledgeMessage message)
+        [HubMethodName(nameof(Ack))]
+        public Task Acknowledge(Ack message)
         {
-            return orchestrator.SendMessage(nameof(AcknowledgeMessage), message);
+            return orchestrator.SendMessage(nameof(Ack), message);
         }
 
-        [HubMethodName(nameof(LooseMessage))]
-        public Task Status(LooseMessage message)
+        [HubMethodName(nameof(Loose))]
+        public Task Status(Loose message)
         {
-            return orchestrator.SendMessage(nameof(LooseMessage), message);
+            return orchestrator.SendMessage(nameof(Loose), message);
         }
 
-        [HubMethodName(nameof(FinishedPerformanceMessage))]
-        public Task FinishedPerformance(FinishedPerformanceMessage message)
+        [HubMethodName(nameof(End))]
+        public Task FinishedPerformance(End message)
         {
-            return orchestrator.SendMessage(nameof(FinishedPerformanceMessage), message);
+            return orchestrator.SendMessage(nameof(End), message);
         }
 
-        [HubMethodName(nameof(PerformancePermissionMessage))]
-        public Task PerformancePermission(PerformancePermissionMessage message)
+        [HubMethodName(nameof(Perm))]
+        public Task PerformancePermission(Perm message)
         {
-            return orchestrator.SendMessage(nameof(PerformancePermissionMessage), message);
+            return orchestrator.SendMessage(nameof(Perm), message);
         }
 
-        [HubMethodName(nameof(RequestPerformanceMessage))]
-        public Task RequestPerformance(RequestPerformanceMessage message)
+        [HubMethodName(nameof(Req))]
+        public Task RequestPerformance(Req message)
         {
-            return orchestrator.SendMessage(nameof(RequestPerformanceMessage), message);
+            return orchestrator.SendMessage(nameof(Req), message);
         }
     }
 }

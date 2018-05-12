@@ -1,12 +1,12 @@
 namespace Shared.Messages
 {
-    public sealed class PerformancePermissionMessage : Message
+    public sealed class Perm : Message
     {
         public PerformancePermission PermissionToPerform { get; set; }
 
         public override string ToString()
         {
-            return $"{nameof(PerformancePermissionMessage)}. Permission: {PermissionToPerform}";
+            return $"{nameof(Perm)}. Permission: {PermissionToPerform}";
         }
     }
 }

@@ -2,11 +2,11 @@ using System;
 
 namespace Shared.Messages
 {
-    public sealed class ConnectMessage : Message
+    public sealed class Conn : Message
     {
         public override string ToString()
         {
-            return $"{nameof(AcknowledgeMessage)}";
+            return $"{nameof(Conn)}";
         }
     }
 }

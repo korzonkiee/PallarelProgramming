@@ -1,10 +1,10 @@
 namespace Shared.Messages
 {
-    public class LooseMessage : Message
+    public sealed class Req : Message
     {
         public override string ToString()
         {
-            return $"{nameof(FinishedPerformanceMessage)}";
+            return $"{nameof(Req)}";
         }
     }
 }

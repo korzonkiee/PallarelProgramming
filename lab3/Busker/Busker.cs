@@ -33,10 +33,10 @@ namespace Busker
         public int Id { get; }
 
         private StateMachine<State, Trigger> stateMachine;
-        private TriggerWithParameters<AcknowledgeMessage> acknowledgeTrigger;
-        private TriggerWithParameters<PerformancePermissionMessage> performancePermissionTrigger;
-        private TriggerWithParameters<RequestPerformanceMessage> requestPerformanceTrigger;
-        private TriggerWithParameters<FinishedPerformanceMessage> finishedPerformanceTrigger;
+        private TriggerWithParameters<Ack> acknowledgeTrigger;
+        private TriggerWithParameters<Perm> performancePermissionTrigger;
+        private TriggerWithParameters<Req> requestPerformanceTrigger;
+        private TriggerWithParameters<End> finishedPerformanceTrigger;
 
         public Busker(int value, Position position)
         {
@@ -59,45 +59,45 @@ namespace Busker
 
             // Create parametrised triggers.
             acknowledgeTrigger = stateMachine
-                .SetTriggerParameters<AcknowledgeMessage>(Trigger.Acknowledge);
+                .SetTriggerParameters<Ack>(Trigger.Ack);
             performancePermissionTrigger = stateMachine
-                .SetTriggerParameters<PerformancePermissionMessage>(Trigger.PermissionResponse);
+                .SetTriggerParameters<Perm>(Trigger.Perm);
             requestPerformanceTrigger = stateMachine
-                .SetTriggerParameters<RequestPerformanceMessage>(Trigger.Request);
+                .SetTriggerParameters<Req>(Trigger.Req);
             finishedPerformanceTrigger = stateMachine
-                .SetTriggerParameters<FinishedPerformanceMessage>(Trigger.FinishedPerformance);
+                .SetTriggerParameters<End>(Trigger.End);
 
             // Configure Disconntected state.
             stateMachine.Configure(State.Disconnected)
-                .Permit(Trigger.Connect, State.Unknown);
+                .Permit(Trigger.Conn, State.Unknown);
 
             // Configure Unknown state.
             stateMachine.Configure(State.Unknown)
                 .OnEntry(UpdateStage)
-                .OnEntry(AcknowledgeNeighbours)
+                .OnEntry(AckNeighs)
                 .Permit(Trigger.Win, State.Winner)
                 .Permit(Trigger.Loose, State.Looser)
-                .InternalTransition<RequestPerformanceMessage>(requestPerformanceTrigger, OnRequest)
-                .InternalTransition<AcknowledgeMessage>(acknowledgeTrigger, OnAcknowledgeNeighbour)
-                .InternalTransition<PerformancePermissionMessage>(performancePermissionTrigger, OnPerformancePermission);
+                .InternalTransition<Req>(requestPerformanceTrigger, OnRequest)
+                .InternalTransition<Ack>(acknowledgeTrigger, OnAcknowledgeNeighbour)
+                .InternalTransition<Perm>(performancePermissionTrigger, OnPerformancePermission);
 
             stateMachine.Configure(State.Looser)
-                .Permit(Trigger.Reset, State.Unknown)
-                .InternalTransition<AcknowledgeMessage>(acknowledgeTrigger, SendBackDecreasedValue)
-                .InternalTransition<RequestPerformanceMessage>(requestPerformanceTrigger, OnRequest)
-                .InternalTransition<FinishedPerformanceMessage>(finishedPerformanceTrigger, OnFinishedPerformance);
+                .Permit(Trigger.Rst, State.Unknown)
+                .InternalTransition<Ack>(acknowledgeTrigger, SendBackDecreasedValue)
+                .InternalTransition<Req>(requestPerformanceTrigger, OnRequest)
+                .InternalTransition<End>(finishedPerformanceTrigger, OnFinishedPerformance);
 
             // Configure Winner state.
             stateMachine.Configure(State.Winner)
-                .OnEntry(MarkNeighboursAsLoosers)
-                .OnEntryAsync(StartPerformance)
-                .Permit(Trigger.FinishedPerformance, State.Inactive)
-                .InternalTransition<RequestPerformanceMessage>(requestPerformanceTrigger, OnRequest);
+                .OnEntry(LooseToNeighs)
+                .OnEntryAsync(Perform)
+                .Permit(Trigger.End, State.Inactive)
+                .OnExit(EndToNeighs)
+                .InternalTransition<Req>(requestPerformanceTrigger, OnRequest);
 
             // Configure Inactive state.
             stateMachine.Configure(State.Inactive)
-                .OnEntry(SendFinishedPerformanceMessage)
-                .InternalTransition<RequestPerformanceMessage>(requestPerformanceTrigger, OnRequest);
+                .InternalTransition<Req>(requestPerformanceTrigger, OnRequest);
 
             return stateMachine;
         }
@@ -105,7 +105,7 @@ namespace Busker
 
         private Task Connect()
         {
-            return connection.InvokeAsync(nameof(ConnectMessage), new ConnectMessage()
+            return connection.InvokeAsync(nameof(Conn), new Conn()
             {
                 SenderId = Id
             });
@@ -113,58 +113,58 @@ namespace Busker
 
         private void SetUpMessageHandlers()
         {
-            connection.On(nameof(ConnectedMessage),
-                () => stateMachine.Fire(Trigger.Connect));
+            connection.On(nameof(Conn),
+                () => stateMachine.Fire(Trigger.Conn));
 
-            connection.On(nameof(AcknowledgeMessage),
-                (AcknowledgeMessage msg) => stateMachine.Fire<AcknowledgeMessage>(acknowledgeTrigger, msg));
+            connection.On(nameof(Ack),
+                (Ack msg) => stateMachine.Fire<Ack>(acknowledgeTrigger, msg));
 
-            connection.On(nameof(LooseMessage),
-                (LooseMessage msg) => stateMachine.Fire(Trigger.Loose));
+            connection.On(nameof(Loose),
+                (Loose msg) => stateMachine.Fire(Trigger.Loose));
 
-            connection.On(nameof(PerformancePermissionMessage),
-                (PerformancePermissionMessage msg) => stateMachine.Fire<PerformancePermissionMessage>(performancePermissionTrigger, msg));
+            connection.On(nameof(Perm),
+                (Perm msg) => stateMachine.Fire<Perm>(performancePermissionTrigger, msg));
 
-            connection.On(nameof(RequestPerformanceMessage),
-                (RequestPerformanceMessage msg) => stateMachine.Fire<RequestPerformanceMessage>(requestPerformanceTrigger, msg));
+            connection.On(nameof(Req),
+                (Req msg) => stateMachine.Fire<Req>(requestPerformanceTrigger, msg));
 
-            connection.On(nameof(FinishedPerformanceMessage),
-                (FinishedPerformanceMessage msg) => stateMachine.Fire<FinishedPerformanceMessage>(finishedPerformanceTrigger, msg));
+            connection.On(nameof(End),
+                (End msg) => stateMachine.Fire<End>(finishedPerformanceTrigger, msg));
         }
 
-        private void AcknowledgeNeighbours()
+        private void AckNeighs()
         {
-            var message = new AcknowledgeMessage()
+            var message = new Ack()
             {
                 Value = this.Value,
                 SenderId = Id,
                 ReceiversIds = neighbours.Keys
             };
 
-            connection.InvokeAsync(nameof(AcknowledgeMessage), message);
+            connection.InvokeAsync(nameof(Ack), message);
         }
 
         // When looser receives AcknowledgeMessage we response to sender
         // with our Value decreased by one so that we give him a chance to
         // become a winner.
-        private void SendBackDecreasedValue(AcknowledgeMessage msg, Transition tran)
+        private void SendBackDecreasedValue(Ack msg, Transition tran)
         {
-            var res = new AcknowledgeMessage()
+            var res = new Ack()
             {
                 Value = this.Value - 1,
                 SenderId = this.Id,
                 ReceiversIds = new List<int>() { msg.SenderId }
             };
 
-            connection.InvokeAsync(nameof(AcknowledgeMessage), res);
+            connection.InvokeAsync(nameof(Ack), res);
         }
 
-        private void OnFinishedPerformance(FinishedPerformanceMessage msg, Transition trans)
+        private void OnFinishedPerformance(End msg, Transition trans)
         {
             // Remove finished busker from neighbours.
             neighbours.Remove(msg.SenderId);
 
-            stateMachine.Fire(Trigger.Reset);
+            stateMachine.Fire(Trigger.Rst);
         }
 
         private void UpdateStage()
@@ -173,7 +173,7 @@ namespace Busker
             ResetNeighbours();
         }
 
-        private void OnRequest(RequestPerformanceMessage msg, Transition trans)
+        private void OnRequest(Req msg, Transition trans)
         {
             PerformancePermission permission;
 
@@ -192,17 +192,17 @@ namespace Busker
                     break;
             }
 
-            var decision = new PerformancePermissionMessage()
+            var decision = new Perm()
             {
                 SenderId = Id,
                 ReceiversIds = new List<int>() { msg.SenderId },
                 PermissionToPerform = permission
             };
 
-            connection.InvokeAsync(nameof(PerformancePermissionMessage), decision);
+            connection.InvokeAsync(nameof(Perm), decision);
         }
 
-        private void OnAcknowledgeNeighbour(AcknowledgeMessage msg, Transition trans)
+        private void OnAcknowledgeNeighbour(Ack msg, Transition trans)
         {
             Logger.Log(this, msg);
             AssignReceivedValueToNeighbour(msg.SenderId, msg.Value);
@@ -213,7 +213,7 @@ namespace Busker
                 RequestNeighboursForPerformance();
         }
 
-        private void OnPerformancePermission(PerformancePermissionMessage msg, Transition trans)
+        private void OnPerformancePermission(Perm msg, Transition trans)
         {
             Logger.Log(this, msg);
             AssignReceivedPermissionToNeighbour(msg.SenderId, msg.PermissionToPerform);
@@ -223,32 +223,32 @@ namespace Busker
 
         }
 
-        private void MarkNeighboursAsLoosers()
+        private void LooseToNeighs()
         {
-            var msg = new LooseMessage()
+            var msg = new Loose()
             {
                 ReceiversIds = neighbours.Keys,
                 SenderId = Id
             };
 
-            connection.InvokeAsync(nameof(LooseMessage), msg);
+            connection.InvokeAsync(nameof(Loose), msg);
         }
 
-        private void SendFinishedPerformanceMessage()
+        private void EndToNeighs()
         {
-            var msg = new FinishedPerformanceMessage()
+            var msg = new End()
             {
                 SenderId = Id,
                 ReceiversIds = neighbours.Keys
             };
 
-            connection.InvokeAsync(nameof(FinishedPerformanceMessage), msg);
+            connection.InvokeAsync(nameof(End), msg);
         }
 
-        private async Task StartPerformance()
+        private async Task Perform()
         {
             await Task.Delay(2000);
-            stateMachine.Fire(Trigger.FinishedPerformance);
+            stateMachine.Fire(Trigger.End);
         }
 
         private void AssignReceivedValueToNeighbour(int neighbourId, int value)
@@ -299,13 +299,13 @@ namespace Busker
         {
             Console.WriteLine($"Busker {Id} knows his neighbours. Requests will be sent.");
 
-            var msg = new RequestPerformanceMessage()
+            var msg = new Req()
             {
                 SenderId = Id,
                 ReceiversIds = neighbours.Keys
             };
 
-            connection.InvokeAsync(nameof(RequestPerformanceMessage), msg);
+            connection.InvokeAsync(nameof(Req), msg);
         }
 
         public void InitializeNeighbours(Dictionary<int, Neighbour> neighbours)
