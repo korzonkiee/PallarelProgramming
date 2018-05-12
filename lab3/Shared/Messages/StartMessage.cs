@@ -1,6 +1,6 @@
-namespace Shared
+namespace Shared.Messages
 {
-    public sealed class StartMessage
+    public sealed class ConnectedMessage
     {
 
     }

@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
-using Shared;
+using Shared.Messages;
 
 namespace Orchestrator
 {
@@ -25,10 +25,10 @@ namespace Orchestrator
             return orchestrator.SendMessage(nameof(AcknowledgeMessage), message);
         }
 
-        [HubMethodName(nameof(StateMessage))]
-        public Task Status(StateMessage message)
+        [HubMethodName(nameof(LooseMessage))]
+        public Task Status(LooseMessage message)
         {
-            return orchestrator.SendMessage(nameof(StateMessage), message);
+            return orchestrator.SendMessage(nameof(LooseMessage), message);
         }
 
         [HubMethodName(nameof(FinishedPerformanceMessage))]

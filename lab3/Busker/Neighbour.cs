@@ -15,5 +15,12 @@ namespace Busker
         {
             Id = id;
         }
+
+        public void Reset()
+        {
+            Value = null;
+            State = BuskerState.Unknown;
+            PermissionToPerform = PerformancePermission.NotSet;
+        }
     }
 }

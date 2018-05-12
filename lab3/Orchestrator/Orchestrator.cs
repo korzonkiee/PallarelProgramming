@@ -2,7 +2,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
-using Shared;
+using Shared.Messages;
 
 namespace Orchestrator
 {
@@ -36,7 +36,7 @@ namespace Orchestrator
                 }
                 else
                 {
-                    await hub.Clients.All.SendAsync(nameof(StartMessage));
+                    await hub.Clients.All.SendAsync(nameof(ConnectedMessage));
                 }
             }
             finally

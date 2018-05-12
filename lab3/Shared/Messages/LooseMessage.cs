@@ -1,6 +1,6 @@
 namespace Shared.Messages
 {
-    public sealed class FinishedPerformanceMessage : Message
+    public class LooseMessage : Message
     {
         public override string ToString()
         {
