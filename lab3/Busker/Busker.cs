@@ -25,10 +25,6 @@ namespace Busker
 
         public int Value { get; }
         public Position Position { get; }
-        public int Stage { get; private set; } = 0;
-        // public BuskerState State { get; private set; } = BuskerState.Unknown;
-
-        private bool isPerforming = false;
 
         public int Id { get; }
 
@@ -200,7 +196,6 @@ namespace Busker
 
         private void UpdateStage()
         {
-            Stage++;
             ResetNeighbours();
         }
 
