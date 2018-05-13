@@ -48,5 +48,11 @@ namespace Orchestrator
         {
             return orchestrator.SendMessage(nameof(Req), message);
         }
+
+        [HubMethodName(nameof(Notify))]
+        public Task RequestPerformance(Notify message)
+        {
+            return orchestrator.SendMessage(nameof(Notify), message);
+        }
     }
 }
